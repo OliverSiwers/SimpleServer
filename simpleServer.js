@@ -23,8 +23,12 @@ function res404(res) {
     res.end('404');
 };
 
+function log(msg) {
+    console.log(`\x1b[36m[${new Date().toLocaleString()}]\x1b[39m ${msg}`);
+}
+
 function startServer() {
-    console.log('Starting the server...');
+    console.log("Server Status: Starting");
     http.createServer(async (req, res) => {
         const decodedPath = allowURIEncoding ? decodeURI(req.url) : req.url;
 
@@ -36,18 +40,21 @@ function startServer() {
 
         if (finalPath.match(/(\/|\\)[^\.]*$/)) finalPath += 'index.html';
 
-        console.log(`[${new Date()}] ${finalPath}`);
-   
+        log(`GET ${finalPath}`);
+
         try {
-            if(finalPath.endsWith('.gz')) res.appendHeader('Content-Encoding', 'gzip');
-            if(finalPath.endsWith('.wasm.gz')) res.appendHeader('Content-Type', 'application/wasm');
+            // These headers let you run gzip encoded Unity WebGL Applications
+            if (finalPath.endsWith('.gz')) res.appendHeader('Content-Encoding', 'gzip');
+            if (finalPath.endsWith('.wasm.gz')) res.appendHeader('Content-Type', 'application/wasm');
 
             res.end(await fs.readFile(finalPath));
-        } catch {
+        } catch (e) {
             res404(res);
+            console.log(e);
+            log(`\x1b[31mFile not found: ${finalPath}`);
         }
     }).listen(port, hostname, () => {
-        console.log('\x1b[F\x1b[2KServer is running');
+        console.log("\x1b[F\x1b[2KServer Status: Running\n");
     });
 }
 
