@@ -43,6 +43,8 @@ function startServer() {
         log(`GET ${finalPath}`);
 
         try {
+            if (finalPath.endsWith('.html')) res.appendHeader('Content-Type', 'text/html; charset=utf-8');
+          
             // These headers let you run gzip encoded Unity WebGL Applications
             if (finalPath.endsWith('.gz')) res.appendHeader('Content-Encoding', 'gzip');
             if (finalPath.endsWith('.wasm.gz')) res.appendHeader('Content-Type', 'application/wasm');
