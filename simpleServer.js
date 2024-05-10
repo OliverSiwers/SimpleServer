@@ -54,6 +54,7 @@ function log(msg) {
 function startServer() {
     console.log("Server Status: Starting");
     http.createServer(async (req, res) => {
+
         // --- Path cleaning---
         const decodedPath = allowURIEncoding ? decodeURI(req.url) : req.url;
 
@@ -62,7 +63,11 @@ function startServer() {
         const safePath = path.normalize(decodedPath).replace(/\.{2,}/g, '');
         let finalPath = rootPath + safePath;
 
-        if (finalPath.match(/(\/|\\)[^\.]*$/)) finalPath += 'index.html';
+        // if final part of the url does not contain a dot, look for an index.html file in the specified location 
+        if (finalPath.match(/(\/|\\)[^\.]*$/)) {
+            if (!finalPath.endsWith("/")) finalPath += "/";
+            finalPath += 'index.html'
+        };
 
         log(`GET ${finalPath}`);
 
