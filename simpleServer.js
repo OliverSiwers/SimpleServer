@@ -54,6 +54,7 @@ function log(msg) {
 function startServer() {
     console.log("Server Status: Starting");
     http.createServer(async (req, res) => {
+        // --- Path cleaning---
         const decodedPath = allowURIEncoding ? decodeURI(req.url) : req.url;
 
         if (decodedPath.indexOf('\0') !== -1) return res404();
@@ -61,12 +62,11 @@ function startServer() {
         const safePath = path.normalize(decodedPath).replace(/\.{2,}/g, '');
         let finalPath = rootPath + safePath;
 
-
         if (finalPath.match(/(\/|\\)[^\.]*$/)) finalPath += 'index.html';
 
         log(`GET ${finalPath}`);
 
-        // Content-Type
+        // --- Content-Type --- 
         mimeTypes.every((type) => {
             if (type.ext.some(fileExtension => finalPath.endsWith(fileExtension))) {
                 res.appendHeader('Content-Type', `${type.type}; charset=utf-8`);
@@ -75,6 +75,7 @@ function startServer() {
             return true;
         });
 
+        // --- Content-Encoding ---
         encodings.every((type) => {
             if (type.ext.some(fileExtension => finalPath.endsWith(fileExtension))) {
                 res.appendHeader('Content-Encoding', `${type.encoding}`);
@@ -83,6 +84,7 @@ function startServer() {
             return true;
         });
 
+        // --- Response ---
         try {
             res.end(await fs.readFile(finalPath));
         } catch (e) {
