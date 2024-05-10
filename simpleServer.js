@@ -65,7 +65,7 @@ function startServer() {
 
         // if final part of the url does not contain a dot, look for an index.html file in the specified location 
         if (finalPath.match(/(\/|\\)[^\.]*$/)) {
-            if (!finalPath.endsWith("/")) finalPath += "/";
+            if (!finalPath.match(/(\\|\/)$/)) finalPath += "\\";
             finalPath += 'index.html'
         };
 
