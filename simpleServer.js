@@ -94,8 +94,11 @@ function startServer() {
             res.end(await fs.readFile(finalPath));
         } catch (e) {
             res404(res);
-            console.log(e);
-            log(`\x1b[31mFile not found: ${finalPath}`);
+            if (e.code === "ENOENT") {
+                log(`\x1b[31mFile not found: ${finalPath}`);
+            } else {
+                console.log(e);
+            }
         }
     }).listen(port, hostname, () => {
         console.log("\x1b[F\x1b[2KServer Status: Running\n");
