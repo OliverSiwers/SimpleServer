@@ -2,6 +2,27 @@ const http = require('http');
 const fs = require('fs/promises');
 const path = require('path');
 
+// The first element in each sub-array is the MIME type, and all subsequent elements are the type's associated file extensions 
+const mimeTypes = [
+    // Text types
+    ["text/css", ".css"],
+    ["text/html", ".html", ".htm"],
+    ["text/javascript", ".js", ".mjs"],
+
+    // Image types
+    ["image/apng", ".apng"],
+    ["image/avif", ".avif"],
+    ["image/gif", ".gif"],
+    ["image/jpeg", ".jpeg", "jpg", "jfif", "pjpeg", "pjp"],
+    ["image/png", ".png"],
+    ["image/svg", ".svg+xml"],
+    ["image/webp", ".webp"],
+
+    // Application types
+    ["application/wasm", ".wasm.gz"],
+
+]
+
 const allowURIEncoding = process.env.ALLOW_URI_ENCODING ?? true;
 const rootPath = process.env.ROOT ?? '.';
 const port = process.env.PORT ?? 80;
@@ -42,13 +63,19 @@ function startServer() {
 
         log(`GET ${finalPath}`);
 
-        try {
-            if (finalPath.endsWith('.html')) res.appendHeader('Content-Type', 'text/html; charset=utf-8');
-          
-            // These headers let you run gzip encoded Unity WebGL Applications
-            if (finalPath.endsWith('.gz')) res.appendHeader('Content-Encoding', 'gzip');
-            if (finalPath.endsWith('.wasm.gz')) res.appendHeader('Content-Type', 'application/wasm');
+        // Content-Type
+        mimeTypes.every((type) => {
+            if (type.slice(1).some(fileExtension => finalPath.endsWith(fileExtension))) {
+                res.appendHeader('Content-Type', `${type[0]}; charset=utf-8`);
+                return false;
+            }
+            return true;
+        });
 
+        // Content-Encoding
+        if (finalPath.endsWith('.gz')) res.appendHeader('Content-Encoding', 'gzip');
+
+        try {
             res.end(await fs.readFile(finalPath));
         } catch (e) {
             res404(res);
