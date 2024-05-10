@@ -96,8 +96,10 @@ function startServer() {
             res404(res);
             if (e.code === "ENOENT") {
                 log(`\x1b[31mFile not found: ${finalPath}`);
-            } else if (e.code === "EPERM") {
+            } else if (e.code === "EACCES") {
                 log(`\x1b[31mPermission denied: ${finalPath}`);
+            } else if (e.code === "EPERM") {
+                log(`\x1b[31mOperation not permitted: ${finalPath}`);
             } else {
                 console.log(e);
             }
