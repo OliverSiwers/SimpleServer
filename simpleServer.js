@@ -21,6 +21,11 @@ const mimeTypes = [
     { type: "application/wasm", ext: [".wasm", ".wasm.gz", ".wasm.br"] },
 ];
 
+const encodings = [
+    { encoding: "gzip", ext: [".wasm.gz"] },
+    { encoding: "br", ext: [".wasm.br"] },
+];
+
 const allowURIEncoding = process.env.ALLOW_URI_ENCODING ?? true;
 const rootPath = process.env.ROOT ?? '.';
 const port = process.env.PORT ?? 80;
@@ -70,8 +75,13 @@ function startServer() {
             return true;
         });
 
-        // Content-Encoding
-        if (finalPath.endsWith('.gz')) res.appendHeader('Content-Encoding', 'gzip');
+        encodings.every((type) => {
+            if (type.ext.some(fileExtension => finalPath.endsWith(fileExtension))) {
+                res.appendHeader('Content-Encoding', `${type.encoding}`);
+                return false;
+            }
+            return true;
+        });
 
         try {
             res.end(await fs.readFile(finalPath));
