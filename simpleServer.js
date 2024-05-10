@@ -2,26 +2,24 @@ const http = require('http');
 const fs = require('fs/promises');
 const path = require('path');
 
-// The first element in each sub-array is the MIME type, and all subsequent elements are the type's associated file extensions 
 const mimeTypes = [
     // Text types
-    ["text/css", ".css"],
-    ["text/html", ".html", ".htm"],
-    ["text/javascript", ".js", ".mjs"],
+    { type: "text/css", ext: [".css"] },
+    { type: "text/html", ext: [".html", ".htm"] },
+    { type: "text/javascript", ext: [".js", ".mjs"] },
 
     // Image types
-    ["image/apng", ".apng"],
-    ["image/avif", ".avif"],
-    ["image/gif", ".gif"],
-    ["image/jpeg", ".jpeg", "jpg", "jfif", "pjpeg", "pjp"],
-    ["image/png", ".png"],
-    ["image/svg", ".svg+xml"],
-    ["image/webp", ".webp"],
+    { type: "image/apng", ext: [".apng"] },
+    { type: "image/avif", ext: [".avif"] },
+    { type: "image/gif", ext: [".gif"] },
+    { type: "image/jpeg", ext: [".jpeg", "jpg", "jfif", "pjpeg", "pjp"] },
+    { type: "image/png", ext: [".png"] },
+    { type: "image/svg", ext: [".svg+xml"] },
+    { type: "image/webp", ext: [".webp"] },
 
     // Application types
-    ["application/wasm", ".wasm.gz"],
-
-]
+    { type: "application/wasm", ext: [".wasm", ".wasm.gz", ".wasm.br"] },
+];
 
 const allowURIEncoding = process.env.ALLOW_URI_ENCODING ?? true;
 const rootPath = process.env.ROOT ?? '.';
@@ -65,8 +63,8 @@ function startServer() {
 
         // Content-Type
         mimeTypes.every((type) => {
-            if (type.slice(1).some(fileExtension => finalPath.endsWith(fileExtension))) {
-                res.appendHeader('Content-Type', `${type[0]}; charset=utf-8`);
+            if (type.ext.some(fileExtension => finalPath.endsWith(fileExtension))) {
+                res.appendHeader('Content-Type', `${type.type}; charset=utf-8`);
                 return false;
             }
             return true;
