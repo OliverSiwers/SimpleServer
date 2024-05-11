@@ -29,7 +29,7 @@ const encodings = [
 const allowURIEncoding = process.env.ALLOW_URI_ENCODING ?? true;
 const rootPath = process.env.ROOT ?? '.';
 const port = process.env.PORT ?? 80;
-const hostname = process.env.HOSTNAME ?? 'localhost';
+const hostname = process.env.HOSTNAME ?? 'localhost';   
 
 function greeting() {
     console.log('\n+------------------------------------------------+');
@@ -66,7 +66,7 @@ function startServer() {
         // if final part of the url does not contain a dot, look for an index.html file in the specified location 
         if (finalPath.match(/(\/|\\)[^\.]*$/)) {
             if (!finalPath.match(/(\\|\/)$/)) finalPath += "\\";
-            finalPath += 'index.html'
+            finalPath += 'index.html';
         };
 
         log(`GET ${finalPath}`);
